@@ -8,9 +8,9 @@
           <!-- thead -->
           <thead>
             <tr>
-              <th @click="getSort('name')">Name</th>
-              <th @click="getSort('age')">Age</th>
-              <th @click="getSort('gender')">Gender</th>
+              <th @click="getSort('name')">Name &#8595;</th>
+              <th @click="getSort('age')">Age &#8595;</th>
+              <th @click="getSort('gender')">Gender &#8595;</th>
             </tr>
           </thead>
 
@@ -27,8 +27,21 @@
           </tbody>
 
         </table>
-        <p>debug: sort:{{currentSort}}, dir:{{currentSortDir}}</p>
+        <p style="text-align:center;">
+          <span>debug: sort:{{currentSort}}, dir:{{currentSortDir}}</span>
+          <span>page: {{this.page.current}}, length: {{this.page.length}}</span>
+        </p>
       </div>
+    </section>
+
+    <!-- buttons -->
+    <section>
+     <div class="container">
+      <div class="button-list">
+        <div class="btn-primary" @click="prevPage">&larr;</div>
+        <div class="btn-primary" @click="nextPage">&rarr;</div>
+      </div>
+     </div>
     </section>
   </div>
 </template>
@@ -41,6 +54,10 @@ export default {
       users: [],
       currentSort:'name',
       currentSortDir:'asc',
+      page:{
+        current:1,
+        length:3
+      }
     };
   },
   created(){
@@ -62,6 +79,10 @@ export default {
         if(a[this.currentSort] < b[this.currentSort]) return -1 * mod
         if(a[this.currentSort] > b[this.currentSort]) return 1 * mod
         return 0
+      }).filter((row, index) => {
+        let start = (this.page.current-1)*this.page.length
+        let end = this.page.current * this.page.length
+        if(index >= start && index < end) return true
       })
      }
    },
@@ -72,6 +93,13 @@ export default {
       }
 
       this.currentSort = e
+    },
+    // Pagination
+    prevPage() {
+      if (this.page.current > 1) this.page.current-=1
+    },
+    nextPage () {
+      if ((this.page.current * this.page.length) < this.users.length) this.page.current+=1
     }
   }
 }
@@ -112,7 +140,7 @@ td img{
 }
 
 table tbody tr {
-  background: #f5f5f5;
+  background: #d3caca;
   font-weight: 600;
   transition: all 0.25s cubic-bezier(0.02, 0.01, 0.47, 1);
   box-shadow: 0 30px 30px rgba(0, 0, 0, 0.02);
@@ -123,5 +151,19 @@ table tbody tr:hover {
   box-shadow: 0 30px 30px rgba(0, 0, 0, 0.04);
   transform: translate(0, -6px);
   transition-delay: 0s !important;
+}
+.button-list{
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.btn-primary{
+  background: #18548b;
+  border-radius: 40px;
+  padding: 8px 30px;
+  cursor: pointer;
+  color: #f5f5f5;
 }
 </style>
