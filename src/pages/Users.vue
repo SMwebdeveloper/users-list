@@ -8,16 +8,16 @@
           <!-- thead -->
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Age</th>
-              <th>Gender</th>
+              <th @click="getSort('name')">Name</th>
+              <th @click="getSort('age')">Age</th>
+              <th @click="getSort('gender')">Gender</th>
             </tr>
           </thead>
 
           <!-- tbody -->
           <tbody>
-            <tr v-for="user in users[0]" :key="user.id">
-              <td class="td-head">
+            <tr v-for="user in usersSort" :key="user.id">
+              <td class="td-head" style="cursor:pointer;">
                 <img :src="user.img" :alt="user.name">
                 <span>{{ user.name }}</span>
               </td>
@@ -27,6 +27,7 @@
           </tbody>
 
         </table>
+        <p>debug: sort:{{currentSort}}, dir:{{currentSortDir}}</p>
       </div>
     </section>
   </div>
@@ -38,20 +39,42 @@ export default {
   data() {
     return {
       users: [],
+      currentSort:'name',
+      currentSortDir:'asc',
     };
   },
   created(){
      axios
      .get('http://localhost:3000/result')
      .then(response => {
-      this.users = response.data
-      console.log(this.users);
+      console.log(response.data[0]);
+      this.users = response.data[0]
      })
      .catch(error => {
       console.log(error);
      })
+  },
+   computed:{
+     usersSort () {
+      return this.users.sort((a, b) => {
+        let mod = 1
+        if(this.currentSortDir === 'asc') mod = -1
+        if(a[this.currentSort] < b[this.currentSort]) return -1 * mod
+        if(a[this.currentSort] > b[this.currentSort]) return 1 * mod
+        return 0
+      })
+     }
+   },
+  methods:{
+    getSort(e) {
+      if(e === this.currentSort){
+        this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc'
+      }
+
+      this.currentSort = e
+    }
   }
-};
+}
 </script>
 <style lang="css" scoped>
 table {
@@ -59,6 +82,10 @@ table {
   line-height: 1.5em;
   border-collapse: separate;
   border-spacing: 0 34px;
+}
+
+thead th{
+  cursor: pointer;
 }
 
 table th {
